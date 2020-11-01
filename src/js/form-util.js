@@ -2,6 +2,7 @@ import { $, $$, downloadBlob } from './dom-utils'
 import { addSlash, getFormattedDate } from './util'
 import pdfBase from '../certificate.pdf'
 import { generatePdf } from './pdf-util'
+import formProfilesData from '../profiles.json'
 
 const conditions = {
   '#field-firstname': {
@@ -72,10 +73,9 @@ export function getProfile (formInputs) {
 }
 
 export function getReasons (reasonInputs) {
-  const reasons = reasonInputs
+  return reasonInputs
     .filter(input => input.checked)
     .map(input => input.value).join(', ')
-  return reasons
 }
 
 export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonAlert, snackbar) {
@@ -101,6 +101,23 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonA
     if (key !== 8 && key !== 46) {
       input.value = addSlash(input.value)
     }
+  })
+  $('#profile-select').addEventListener('change', function (event) {
+    event.preventDefault()
+    if ($('#profile-select') === null || $('#profile-select') === '') {
+      console.log('returned')
+      return
+    }
+
+    const e = $('#profile-select').value
+    const profiles = formProfilesData
+    const fields = ['firstname', 'lastname', 'birthday', 'placeofbirth', 'address', 'city', 'zipcode']
+    fields.forEach(field => {
+      console.log(field)
+      $(`#field-${field}`).value = profiles[e][field]
+    })
+    console.log(e)
+    console.log(profiles[e].lastname)
   })
 
   reasonInputs.forEach(radioInput => {

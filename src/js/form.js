@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import '../css/main.css'
 
 import formData from '../form-data.json'
+import formProfilesData from '../profiles.json'
 
 import { $, appendTo, createElement } from './dom-utils'
 
@@ -133,6 +134,31 @@ const createReasonFieldset = (reasonsData) => {
   return fieldset
 }
 
+
+
+
+const createProfilesDropdown = (Profiles) => {
+  const formProfilesAttrs = {
+    id: 'profile-select',
+    className: 'profile-select',
+    onchange: 'autoFill',
+  }
+  const selectProfiles = createElement('select', formProfilesAttrs)
+  const appendSelectProfiles = appendTo(selectProfiles)
+  const option = createElement('option')
+  option.value = ''
+  option.text = 'Choose Profile'
+  appendSelectProfiles(option)
+
+  for (const [cle, valeur] of Object.entries(Profiles)) {
+    const option = createElement('option')
+    option.value = cle
+    option.text = cle
+    appendSelectProfiles(option)
+  }
+  return selectProfiles
+}
+
 export function createForm () {
   const form = $('#form-profile')
   // Évite de recréer le formulaire s'il est déjà créé par react-snap (ou un autre outil de prerender)
@@ -160,7 +186,12 @@ export function createForm () {
   const reasonsData = formData
     .flat(1)
     .find(field => field.key === 'reason')
-
   const reasonFieldset = createReasonFieldset(reasonsData)
-  appendToForm([...createTitle(), ...formFirstPart, reasonFieldset])
+
+  const profiles = formProfilesData
+  const profilesSet = createProfilesDropdown(profiles)
+  appendToForm([...createTitle(), profilesSet, ...formFirstPart, reasonFieldset])
+  console.log('OKOK')
 }
+
+

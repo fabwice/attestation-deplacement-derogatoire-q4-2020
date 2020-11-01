@@ -209,5 +209,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
+profiles.json
 # End of https://www.toptal.com/developers/gitignore/api/node,code,linux,vim,windows,macos
