@@ -1,4 +1,4 @@
-import { $, $$, downloadBlob } from './dom-utils'
+import { $, $$, downloadBlob, openInNewTab } from './dom-utils'
 import { addSlash, getFormattedDate } from './util'
 import pdfBase from '../certificate.pdf'
 import { generatePdf } from './pdf-util'
@@ -157,7 +157,7 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonA
       .replace(':', '-')
 
     downloadBlob(pdfBlob, `attestation-${creationDate}_${creationHour}.pdf`)
-
+    // openInNewTab(pdfBlob)
     snackbar.classList.remove('d-none')
     setTimeout(() => snackbar.classList.add('show'), 100)
 

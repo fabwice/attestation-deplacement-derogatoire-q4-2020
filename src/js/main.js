@@ -8,7 +8,7 @@ import { prepareForm } from './form-util'
 import { warnFacebookBrowserUserIfNecessary } from './facebook-util'
 import { addVersion } from './util'
 import { createForm } from './form'
-import {$} from "./dom-utils";
+import { $ } from './dom-utils'
 
 warnFacebookBrowserUserIfNecessary()
 createForm()
@@ -24,9 +24,21 @@ function docReady () {
       if (localStorage.getItem(field) != null) {
         $(`#field-${field}`).value = localStorage.getItem(field)
       }
+      auto()
     })
   } else {
-    document.addEventListener('DOMContentLoaded', docReady);
+    document.addEventListener('DOMContentLoaded', docReady)
   }
 }
 docReady()
+
+function auto () {
+  const queryString = window.location.search
+  const urlParams = new URLSearchParams(queryString)
+
+  if (urlParams.has('auto')) {
+    const reason = urlParams.get('auto')
+    $(`#checkbox-${reason}`).checked = true
+    $('#generate-btn').click()
+  }
+}

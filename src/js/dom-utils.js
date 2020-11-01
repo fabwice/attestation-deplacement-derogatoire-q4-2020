@@ -41,3 +41,9 @@ export function downloadBlob (blob, fileName) {
   document.body.appendChild(link)
   link.click()
 }
+
+export function openInNewTab (blob) {
+  const url = URL.createObjectURL(blob)
+  const win = window.open(url, '_blank')
+  win.focus()
+}
