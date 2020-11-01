@@ -102,23 +102,23 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonA
       input.value = addSlash(input.value)
     }
   })
-  $('#profile-select').addEventListener('change', function (event) {
-    event.preventDefault()
-    if ($('#profile-select') === null || $('#profile-select') === '') {
-      console.log('returned')
-      return
-    }
-
-    const e = $('#profile-select').value
-    const profiles = formProfilesData
-    const fields = ['firstname', 'lastname', 'birthday', 'placeofbirth', 'address', 'city', 'zipcode']
-    fields.forEach(field => {
-      console.log(field)
-      $(`#field-${field}`).value = profiles[e][field]
-    })
-    console.log(e)
-    console.log(profiles[e].lastname)
-  })
+  // $('#profile-select').addEventListener('change', function (event) {
+  //   event.preventDefault()
+  //   if ($('#profile-select') === null || $('#profile-select') === '') {
+  //     console.log('returned')
+  //     return
+  //   }
+  //
+  //   const e = $('#profile-select').value
+  //   const profiles = formProfilesData
+  //   const fields = ['firstname', 'lastname', 'birthday', 'placeofbirth', 'address', 'city', 'zipcode']
+  //   fields.forEach(field => {
+  //     console.log(field)
+  //     $(`#field-${field}`).value = profiles[e][field]
+  //   })
+  //   console.log(e)
+  //   console.log(profiles[e].lastname)
+  // })
 
   reasonInputs.forEach(radioInput => {
     radioInput.addEventListener('change', function (event) {
@@ -130,7 +130,6 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonA
 
   $('#generate-btn').addEventListener('click', async (event) => {
     event.preventDefault()
-
     const reasons = getReasons(reasonInputs)
     if (!reasons) {
       reasonFieldset.classList.add('fieldset-error')
@@ -145,7 +144,10 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonA
     }
 
     console.log(getProfile(formInputs), reasons)
-
+    const fields = ['firstname', 'lastname', 'birthday', 'placeofbirth', 'address', 'city', 'zipcode']
+    fields.forEach(field => {
+      localStorage.setItem(field, $(`#field-${field}`).value);
+    })
     const pdfBlob = await generatePdf(getProfile(formInputs), reasons, pdfBase)
 
     const creationInstant = new Date()

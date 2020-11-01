@@ -134,30 +134,27 @@ const createReasonFieldset = (reasonsData) => {
   return fieldset
 }
 
-
-
-
-const createProfilesDropdown = (Profiles) => {
-  const formProfilesAttrs = {
-    id: 'profile-select',
-    className: 'profile-select',
-    onchange: 'autoFill',
-  }
-  const selectProfiles = createElement('select', formProfilesAttrs)
-  const appendSelectProfiles = appendTo(selectProfiles)
-  const option = createElement('option')
-  option.value = ''
-  option.text = 'Choose Profile'
-  appendSelectProfiles(option)
-
-  for (const [cle, valeur] of Object.entries(Profiles)) {
-    const option = createElement('option')
-    option.value = cle
-    option.text = cle
-    appendSelectProfiles(option)
-  }
-  return selectProfiles
-}
+// const createProfilesDropdown = (Profiles) => {
+//   const formProfilesAttrs = {
+//     id: 'profile-select',
+//     className: 'profile-select',
+//     onchange: 'autoFill',
+//   }
+//   const selectProfiles = createElement('select', formProfilesAttrs)
+//   const appendSelectProfiles = appendTo(selectProfiles)
+//   const option = createElement('option')
+//   option.value = ''
+//   option.text = 'Choose Profile'
+//   appendSelectProfiles(option)
+//
+//   for (const [cle, valeur] of Object.entries(Profiles)) {
+//     const option = createElement('option')
+//     option.value = cle
+//     option.text = cle
+//     appendSelectProfiles(option)
+//   }
+//   return selectProfiles
+// }
 
 export function createForm () {
   const form = $('#form-profile')
@@ -188,10 +185,8 @@ export function createForm () {
     .find(field => field.key === 'reason')
   const reasonFieldset = createReasonFieldset(reasonsData)
 
-  const profiles = formProfilesData
-  const profilesSet = createProfilesDropdown(profiles)
-  appendToForm([...createTitle(), profilesSet, ...formFirstPart, reasonFieldset])
-  console.log('OKOK')
+  // const profiles = formProfilesData
+  // const profilesSet = createProfilesDropdown(profiles)
+  // appendToForm([...createTitle(), profilesSet, ...formFirstPart, reasonFieldset])
+  appendToForm([...createTitle(), ...formFirstPart, reasonFieldset])
 }
-
-

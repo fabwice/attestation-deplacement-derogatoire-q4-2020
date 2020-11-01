@@ -8,8 +8,25 @@ import { prepareForm } from './form-util'
 import { warnFacebookBrowserUserIfNecessary } from './facebook-util'
 import { addVersion } from './util'
 import { createForm } from './form'
+import {$} from "./dom-utils";
 
 warnFacebookBrowserUserIfNecessary()
 createForm()
 prepareForm()
 addVersion(process.env.VERSION)
+
+function docReady () {
+  // see if DOM is already available
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    // call on next available tick
+    const fields = ['firstname', 'lastname', 'birthday', 'placeofbirth', 'address', 'city', 'zipcode']
+    fields.forEach(field => {
+      if (localStorage.getItem(field) != null) {
+        $(`#field-${field}`).value = localStorage.getItem(field)
+      }
+    })
+  } else {
+    document.addEventListener('DOMContentLoaded', docReady);
+  }
+}
+docReady()
