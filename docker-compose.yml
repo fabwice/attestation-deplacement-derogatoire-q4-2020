@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  attestation-covid:
+    build: .
+    image: fabwice/attestation-covid:q4-2020
+    container_name: attestation-covid
+    ports:
+      - "1234:1234"
+    networks:
+      - attestation_net
+
+networks:
+
+  attestation_net:
+    name: attestation_net
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.25.0.76/30"

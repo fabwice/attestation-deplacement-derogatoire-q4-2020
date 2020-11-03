@@ -11,22 +11,21 @@ const createTitle = () => {
   const p = createElement('p', { className: 'msg-info', innerHTML: 'Tous les champs sont obligatoires.' })
   return [h2, p]
 }
-// createElement('div', { className: 'form-group' })
 
 const createFormGroup = ({
-  autocomplete = false,
-  autofocus = false,
-  inputmode,
-  label,
-  max,
-  min,
-  maxlength,
-  minlength,
-  name,
-  pattern,
-  placeholder = '',
-  type = 'text',
-}) => {
+                           autocomplete = false,
+                           autofocus = false,
+                           inputmode,
+                           label,
+                           max,
+                           min,
+                           maxlength,
+                           minlength,
+                           name,
+                           pattern,
+                           placeholder = '',
+                           type = 'text',
+                         }) => {
   const formGroup = createElement('div', { className: 'form-group' })
   const labelAttrs = {
     for: `field-${name}`,
@@ -103,7 +102,7 @@ const createReasonFieldset = (reasonsData) => {
   const appendToFieldset = appendTo(fieldset)
 
   const legendAttrs = {
-    className: 'legend titre 3 ',
+    className: 'legend titre-3',
     innerHTML: 'Choisissez un motif de déplacement',
   }
   const legend = createElement('legend', legendAttrs)
@@ -112,9 +111,7 @@ const createReasonFieldset = (reasonsData) => {
   const textAlert = createElement('p', textAlertAttrs)
 
   const textSubscribeReasonAttrs = {
-    innerHTML: `certifie que mon déplacement est lié au motif suivant (cocher la case) autorisé en application des 
-    mesures générales nécessaires pour faire face à l'épidémie de Covid19 dans le cadre de l'état 
-    d'urgence sanitaire <a class="footnote" id="footnote1" href="#footnote1">[1]</a>&nbsp;:`,
+    innerHTML: 'certifie que mon déplacement est lié au motif suivant (cocher la case) autorisé par le décret n°2020-1310 du 29 octobre 2020 prescrivant les mesures générales nécessaires pour faire face à l\'épidémie de Covid19 dans le cadre de l\'état d\'urgence sanitaire  <a class="footnote" href="#footnote1">[1]</a>&nbsp;:',
   }
 
   const textSubscribeReason = createElement('p', textSubscribeReasonAttrs)
@@ -140,12 +137,12 @@ export function createForm () {
     .filter(field => field.key !== 'reason')
     .filter(field => !field.isHidden)
     .map((field,
-      index) => {
+          index) => {
       const formGroup = createFormGroup({
-        autofocus: index === 0,
-        ...field,
-        name: field.key,
-      })
+                                          autofocus: index === 0,
+                                          ...field,
+                                          name: field.key,
+                                        })
 
       return formGroup
     })

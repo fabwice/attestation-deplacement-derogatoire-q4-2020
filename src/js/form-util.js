@@ -1,7 +1,14 @@
-import { $, $$, downloadBlob } from './dom-utils'
-import { addSlash, getFormattedDate } from './util'
+import removeAccents from 'remove-accents'
+
+import {$, $$, downloadBlob} from './dom-utils'
+import {addSlash, getFormattedDate} from './util'
 import pdfBase from '../certificate.pdf'
-import { generatePdf } from './pdf-util'
+import {generatePdf} from './pdf-util'
+import SecureLS from 'secure-ls'
+
+const secureLS = new SecureLS({ encodingType: 'aes' })
+const clearDataSnackbar = $('#snackbar-cleardata')
+const storeDataInput = $('#field-storedata')
 
 const conditions = {
   '#field-firstname': {
@@ -53,9 +60,57 @@ function validateAriaFields () {
     .includes(true)
 }
 
+function updateSecureLS (formInputs, reasonInputs) {
+  if (wantDataToBeStored() === true) {
+    secureLS.set('profile', getProfile(formInputs))
+    secureLS.set('reason', getReasonsObject(reasonInputs))
+  } else {
+    clearSecureLS()
+  }
+}
+
+function clearSecureLS () {
+  secureLS.clear()
+}
+
+function clearForm () {
+  const formProfile = $('#form-profile')
+  formProfile.reset()
+  storeDataInput.checked = false
+}
+
+function setCurrentDate (releaseDateInput, releaseTimeInput) {
+  const currentDate = new Date()
+
+  releaseDateInput.value = getFormattedDate(currentDate)
+  releaseTimeInput.value = currentDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+}
+
+function showSnackbar (snackbarToShow, showDuration = 6000) {
+  snackbarToShow.classList.remove('d-none')
+  setTimeout(() => snackbarToShow.classList.add('show'), 100)
+
+  setTimeout(function () {
+    snackbarToShow.classList.remove('show')
+    setTimeout(() => snackbarToShow.classList.add('d-none'), 500)
+  }, showDuration)
+}
+
+export function wantDataToBeStored () {
+  return storeDataInput.checked
+}
+
 export function setReleaseDateTime (releaseDateInput) {
   const loadedDate = new Date()
   releaseDateInput.value = getFormattedDate(loadedDate)
+}
+export function toAscii (string) {
+  if (typeof string !== 'string') {
+    throw new Error('Need string')
+  }
+  const accentsRemoved = removeAccents(string)
+  const asciiString = accentsRemoved.replace(/[^\x00-\x7F]/g, '') // eslint-disable-line no-control-regex
+  return asciiString
 }
 
 export function getProfile (formInputs) {
@@ -66,20 +121,53 @@ export function getProfile (formInputs) {
       const dateSortie = field.value.split('-')
       value = `${dateSortie[2]}/${dateSortie[1]}/${dateSortie[0]}`
     }
+    if (typeof value === 'string') {
+      value = toAscii(value)
+    }
     fields[field.id.substring('field-'.length)] = value
   }
   return fields
 }
 
 export function getReasons (reasonInputs) {
-  const reasons = reasonInputs
+  return reasonInputs
     .filter(input => input.checked)
     .map(input => input.value).join(', ')
-  return reasons
 }
 
-export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonAlert, snackbar) {
+export function getReasonsObject (reasonInputs) {
+  return reasonInputs
+    .filter((reason) => reason.checked)
+    .reduce((map, reason) => {
+      map[reason.value] = reason.checked
+      return map
+    }, {})
+}
+
+export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonAlert, snackbar, releaseDateInput, releaseTimeInput) {
+  const lsProfile = secureLS.get('profile')
+  const lsReason = secureLS.get('reason')
+  const currentDate = new Date()
+  const formattedDate = getFormattedDate(currentDate)
+  const formattedTime = currentDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+
+  // Continue to store data if already stored
+  storeDataInput.checked = lsReason || lsProfile
+
   formInputs.forEach((input) => {
+    switch (input.name) {
+      case 'datesortie':
+        input.value = formattedDate
+        break
+      case 'heuresortie':
+        input.value = formattedTime
+        break
+      case 'field-reason':
+        if (lsReason) input.checked = lsReason[input.value]
+        break
+      default:
+        if (lsProfile) input.value = lsProfile[input.name]
+    }
     const exempleElt = input.parentNode.parentNode.querySelector('.exemple')
     const validitySpan = input.parentNode.parentNode.querySelector('.validity')
     if (input.placeholder && exempleElt) {
@@ -111,6 +199,13 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonA
     })
   })
 
+  $('#cleardata').addEventListener('click', () => {
+    clearSecureLS()
+    clearForm()
+    setCurrentDate(releaseDateInput, releaseTimeInput)
+    showSnackbar(clearDataSnackbar, 1200)
+  })
+
   $('#generate-btn').addEventListener('click', async (event) => {
     event.preventDefault()
 
@@ -127,7 +222,7 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldset, reasonA
       return
     }
 
-    console.log(getProfile(formInputs), reasons)
+    updateSecureLS(formInputs, reasonInputs)
 
     const pdfBlob = await generatePdf(getProfile(formInputs), reasons, pdfBase)
 
@@ -156,6 +251,7 @@ export function prepareForm () {
   const reasonFieldset = $('#reason-fieldset')
   const reasonAlert = reasonFieldset.querySelector('.msg-alert')
   const releaseDateInput = $('#field-datesortie')
+  const releaseTimeInput = $('#field-heuresortie')
   setReleaseDateTime(releaseDateInput)
-  prepareInputs(formInputs, reasonInputs, reasonFieldset, reasonAlert, snackbar)
+  prepareInputs(formInputs, reasonInputs, reasonFieldset, reasonAlert, snackbar, releaseDateInput, releaseTimeInput)
 }
